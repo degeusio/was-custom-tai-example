@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<server description="Default server">
+    <!-- xml file copied from example from the docker container at /opt/ibm/wlp/usr/servers/defaultServer/server.xml .
+            and adjusted for TAI config ONLY as per https://www.ibm.com/support/knowledgecenter/SSEQTP_liberty/com.ibm.websphere.wlp.doc/ae/twlp_sec_tai.html
+    -->
+
+    <!-- Enable features -->
+    <featureManager>
+        <feature>javaee-8.0</feature>
+	    <feature>microProfile-3.0</feature>
+        <feature>appSecurity-3.0</feature>
+    </featureManager>
+
+    <trustAssociation id="myTrustAssociation" invokeForUnprotectedURI="false"
+        failOverToAppAuthType="false">
+        <interceptors id="CustomTAI" enabled="true"
+                      className="io.degeus.CustomTAI"
+                      invokeBeforeSSO="true" invokeAfterSSO="false"
+                      libraryRef="global"
+        >
+            <properties prop1="value1" prop2="value2"/>
+        </interceptors>
+    </trustAssociation>
+
+    <library id="global">
+        <!-- just add the custom-tai jar to the global libraries by using 'global' as id,
+          see https://www.ibm.com/support/knowledgecenter/SSEQTP_liberty/com.ibm.websphere.wlp.doc/ae/twlp_classloader_global_libs.html
+         -->
+        <fileset dir="/tmp" includes="*.jar"/>
+    </library>
+
+        <!-- This template enables security. To get the full use of all the capabilities, a keystore and user registry are required. -->
+    
+    <!-- For the keystore, default keys are generated and stored in a keystore. To provide the keystore password, generate an 
+         encoded password using bin/securityUtility encode and add it below in the password attribute of the keyStore element. 
+         Then uncomment the keyStore element. -->
+    <!--
+    <keyStore password=""/> 
+    -->
+    
+    <!--For a user registry configuration, configure your user registry. For example, configure a basic user registry using the
+        basicRegistry element. Specify your own user name below in the name attribute of the user element. For the password, 
+        generate an encoded password using bin/securityUtility encode and add it in the password attribute of the user element. 
+        Then uncomment the user element. -->
+    <basicRegistry id="basic" realm="BasicRealm"> 
+        <!-- <user name="yourUserName" password="" />  --> 
+    </basicRegistry>
+    
+    <!-- To allow access to this server from a remote client host="*" has been added to the following element -->
+    <httpEndpoint id="defaultHttpEndpoint"
+                  host="*"
+		  httpPort="9080"
+                  httpsPort="9443" />
+                  
+    <!-- Automatically expand WAR files and EAR files -->
+    <applicationManager autoExpand="true"/>
+
+</server>
